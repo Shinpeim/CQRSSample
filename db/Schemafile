@@ -1,0 +1,12 @@
+create_table "workers" do |t|
+  t.string   "name", nil:false
+  t.integer  "role", nil:false # 1: developer, 2: manager
+end
+
+add_index "workers", ["name"], unique: true
+
+create_table "tasks" do |t|
+  t.string "description", nil:false
+  t.integer "assignee_id"
+  t.integer "status" # 1: opened, 2: assigned, 3:working, 4:reviewing, 5:closed
+end
