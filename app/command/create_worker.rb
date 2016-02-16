@@ -1,25 +1,31 @@
 require 'command'
-
 class Command
   class CreateWorker < Command
     attr_reader :name, :role
-
-    ROLE_MAPPING = { 1 => :developer, 2 => :manager }
 
     # コマンドでは入力値が妥当であるか、という観点でvalidationを行う
     validates_presence_of :name
     validates_length_of :name, maximum: 30
 
     validates_presence_of :role
-    validates_inclusion_of :role, in: ROLE_MAPPING.keys
+    validates_inclusion_of :role, in: ["developer", "manager"]
 
-    def initialize(name, role)
+    validate :should_have_unique_name
+
+    def initialize(name, role, repository)
       @name = name
       @role = role
+      @repository = repository
     end
 
     def role_as_symbol
-      ROLE_MAPPING[@role]
+      @role.to_sym
+    end
+
+    private
+
+    def should_have_unique_name
+      errors.add(:name, :uniqueness) unless @repository.find_by_name(@name).nil?
     end
   end
 end
