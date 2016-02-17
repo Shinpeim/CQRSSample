@@ -3,8 +3,10 @@ require 'domain/error'
 
 # EntityObjectやValueObjectは「Always Valid」であるように保つ
 class Worker # Entity Object
-  def initialize(id, name, role_symbol)
-    @id = id
+  attr_reader :uuid, :name, :role
+
+  def initialize(uuid, name, role_symbol)
+    @uuid = uuid
     @name = name
     @role = Role.new(role_symbol)
   end
@@ -13,10 +15,11 @@ end
 class Role # Value Object
   POSIBLE_ROLES = [:developer, :manager]
 
+  attr_reader :symbol
+
   def initialize(symbol)
-    p symbol
     raise Domain::Error, "invalid role" unless POSIBLE_ROLES.include?(symbol)
-    @role = symbol
+    @symbol = symbol
   end
 
   def developer?
@@ -24,6 +27,6 @@ class Role # Value Object
   end
 
   def manager?
-    @symbol == :maneger
+    @symbol == :manager
   end
 end

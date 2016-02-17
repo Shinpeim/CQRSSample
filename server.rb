@@ -44,3 +44,24 @@ get '/workers' do
     end
   ReadLayer::ShowWorkers.list(page).to_json
 end
+
+require 'command/open_task'
+require 'application_service/task_service'
+require 'repository/task_repository'
+post '/tasks' do
+  command = Command::OpenTask.new(
+    params["opener_uuid"],
+    params["description"],
+    params["assignee_uuid"],
+  )
+
+  service = ApplicationService::TaskService.new(TaskRepository, WorkerRepository)
+
+  begin
+    service.handleOpenCommand(command)
+    {}.to_json
+  rescue ApplicationService::ValidationError => e
+    status 400
+    e.details.to_json
+  end
+end

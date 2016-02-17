@@ -8,15 +8,19 @@ class ApplicationService::WorkerService
 
   # applciation service では Commandを引数に取り、
   def handleCreateCommand(command)
-
     # 入力の妥当性をチェックし
     if command.invalid?
       raise ApplicationService::ValidationError.new(command.errors.details)
     end
 
     # コマンドに応じてrepositoryやentityを操作する
+    worker = Worker.new(
+      @repository.next_id,
+      command.name,
+      command.role_as_symbol
+    )
     ActiveRecord::Base.transaction do
-      @repository.create(command.name, command.role_as_symbol)
+      @repository.save(worker)
     end
   end
 end
