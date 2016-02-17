@@ -33,3 +33,14 @@ post '/workers' do
     e.details.to_json
   end
 end
+
+require 'read_layer/show_workers'
+get '/workers' do
+  page =
+    if params['page'].to_i < 1
+      1
+    else
+      params['page'].to_i
+    end
+  ReadLayer::ShowWorkers.list(page).to_json
+end

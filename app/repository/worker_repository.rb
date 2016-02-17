@@ -1,20 +1,17 @@
 require 'domain/model/worker'
+require 'table/workers'
 
 class WorkerRepository
-  class Table < ActiveRecord::Base
-    self.table_name = "workers"
-  end
-
   class << self
     ROLE_MAPPING = {1 => :developer, 2 => :manager}
 
     def create(name, role)
-      record = Table.create(name: name, role: ROLE_MAPPING.invert[role])
+      record = Table::Workers.create(name: name, role: ROLE_MAPPING.invert[role])
       build_entity_from_record(record)
     end
 
     def find_by_name(name)
-      record = Table.find_by(name: name)
+      record = Table::Workers.find_by(name: name)
       build_entity_from_record(record)
     end
 
