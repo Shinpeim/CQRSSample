@@ -10,6 +10,10 @@ class TaskRepository
       SecureRandom.uuid
     end
 
+    def find(uuid)
+      build_entity_from_record(Table::Tasks.find_by(uuid: uuid))
+    end
+
     def save(task)
       record = Table::Tasks.find_or_create_by(uuid: task.uuid) do |r|
         r.description = task.description

@@ -63,5 +63,39 @@ post '/tasks' do
   rescue ApplicationService::ValidationError => e
     status 400
     e.details.to_json
+  rescue Domain::Error => e
+    status 400
+    {error: e.message}.to_json
+  end
+end
+
+require 'read_layer/show_tasks'
+get '/tasks' do
+  page =
+    if params['page'].to_i < 1
+      1
+    else
+      params['page'].to_i
+    end
+  ReadLayer::ShowTasks.list(page).to_json
+end
+
+require 'command/assign_task'
+put '/tasks/:task_uuid/assignee' do
+  command = Command::AssignTask.new(
+    params["assigner_uuid"],
+    params["task_uuid"],
+    params["assignee_uuid"],
+  )
+  service = ApplicationService::TaskService.new(TaskRepository, WorkerRepository)
+  begin
+    service.handle_assign_command(command)
+    {}.to_json
+  rescue ApplicationService::ValidationError => e
+    status 400
+    e.details.to_json
+  rescue Domain::Error => e
+    status 400
+    {error: e.message}.to_json
   end
 end

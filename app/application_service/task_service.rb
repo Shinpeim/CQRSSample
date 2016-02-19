@@ -22,14 +22,30 @@ class ApplicationService::TaskService
       else
         nil
       end
+
     task = Task.open(
       opener,
       @task_repository.next_id,
       command.description,
       assignee
     )
+
     ActiveRecord::Base.transaction do
       @task_repository.save(task)
     end
+  end
+
+  def handle_assign_command(command)
+    if command.invalid?
+      raise ApplicationService::ValidationError.new(command.errors.details)
+    end
+
+    assigner = @worker_repository.find(command.assigner_uuid)
+    assignee = @worker_repository.find(command.assignee_uuid)
+    task = @task_repository.find(command.task_uuid)
+
+    task.assign(assigner, assignee)
+
+    @task_repository.save(task)
   end
 end

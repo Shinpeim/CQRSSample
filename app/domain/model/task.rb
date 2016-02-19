@@ -28,6 +28,14 @@ class Task # Entity Object
     @assignee_uuid = assignee_uuid
     @status = Status.new(status)
   end
+
+  def assign(assigner, assignee)
+    if ! assigner.role.manager?
+      raise PermissionError, "only manager can assign a developer"
+    end
+
+    assignee_uuid = assignee.uuid
+  end
 end
 
 class Status # Value Object
